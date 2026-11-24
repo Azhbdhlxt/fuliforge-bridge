@@ -2,7 +2,7 @@ var edaEsbuildExportName = (function () {
 	"use strict";
 
 	// ─────────────────────────── 常量 ───────────────────────────
-	var EXT_VERSION = "0.1.3";
+	var EXT_VERSION = "0.1.4";
 	var PROTOCOL_VERSION = 1;
 	var SERVICE = "fuliforge-bridge";
 	var HUB_MARK = "fuliforge-hub";
@@ -229,7 +229,9 @@ var edaEsbuildExportName = (function () {
 	}
 
 	function reply(id, result) {
-		sendRaw({ type: "result", id: id, result: plain(result, 6), timestamp: Date.now() });
+		// 深度 10：规则配置是 Spacing/Physics/Track/copperThickness1oz 这种 5-6 层嵌套，
+		// 压得太浅会把真实数值变成 "[max-depth]"
+		sendRaw({ type: "result", id: id, result: plain(result, 10), timestamp: Date.now() });
 	}
 
 	function replyError(id, error, extra) {
@@ -773,7 +775,7 @@ var edaEsbuildExportName = (function () {
 			return;
 		}
 		try {
-			bucket[key] = plain(await eda[ns][method].apply(eda[ns], args || []), 5);
+			bucket[key] = plain(await eda[ns][method].apply(eda[ns], args || []), 8);
 			bucket.apis[path] = "ok";
 		} catch (e) {
 			bucket.apis[path] = "error: " + msg(e);
@@ -878,7 +880,13 @@ var edaEsbuildExportName = (function () {
 		if (!hasApi("eda.sch_PrimitiveComponent.getAllPrimitiveId")) {
 			throw new Error("缺少 sch_PrimitiveComponent.getAllPrimitiveId");
 		}
-		var ids = await eda.sch_PrimitiveComponent.getAllPrimitiveId();
+		var ids;
+		try {
+			ids = await eda.sch_PrimitiveComponent.getAllPrimitiveId();
+		} catch (e) {
+			throw new Error("读取当前原理图图元失败（" + msg(e) +
+				"）。这条 API 只对活动文档有效：如果你现在停在 PCB 页面，请先点开原理图页（Schematic1 → P1）再试");
+		}
 		if (!ids || !ids.length) return items;
 		var comps = await eda.sch_PrimitiveComponent.get(ids);
 		var list = Array.isArray(comps) ? comps : [comps];

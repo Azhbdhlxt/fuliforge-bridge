@@ -2,7 +2,7 @@ var edaEsbuildExportName = (function () {
 	"use strict";
 
 	// ─────────────────────────── 常量 ───────────────────────────
-	var EXT_VERSION = "0.1.4";
+	var EXT_VERSION = "0.1.5";
 	var PROTOCOL_VERSION = 1;
 	var SERVICE = "fuliforge-bridge";
 	var HUB_MARK = "fuliforge-hub";
@@ -890,38 +890,39 @@ var edaEsbuildExportName = (function () {
 		if (!ids || !ids.length) return items;
 		var comps = await eda.sch_PrimitiveComponent.get(ids);
 		var list = Array.isArray(comps) ? comps : [comps];
+		// 批量 get() 返回的对象不一定带完整状态：把每个图元的 getState_* 全部调一遍，
+		// 原样回传，服务端才能看出到底哪个字段是位号、哪个是器件名。
+		var sts = ["PrimitiveId", "PrimitiveType", "ComponentType", "Designator", "Name",
+			"X", "Y", "Rotation", "Mirror", "AddIntoBom", "AddIntoPcb",
+			"Manufacturer", "ManufacturerId", "Supplier", "SupplierId",
+			"UniqueId", "SubPartName", "Net"];
+		var objKeys = ["Component", "Symbol", "Footprint", "OtherProperty"];
 		for (var i = 0; i < list.length && i < 500; i++) {
 			var c = list[i];
-			if (!c || typeof c.getState_Component !== "function") continue;
-			var ref = null;
-			try { ref = c.getState_Component(); } catch (e) { ref = null; }
-			if (!ref || !ref.uuid || !ref.libraryUuid) continue;
-			var key = ref.libraryUuid + "|" + ref.uuid;
-			if (seen[key]) continue;
-			seen[key] = true;
-			items.push({
-				deviceUuid: ref.uuid,
-				libraryUuid: ref.libraryUuid,
-				deviceName: ref.name || "",
-				designators: []
-			});
-		}
-		// 位号补全
-		for (var j = 0; j < list.length && j < 500; j++) {
-			var cc = list[j];
-			if (!cc || typeof cc.getState_Component !== "function") continue;
-			var r2 = null;
-			try { r2 = cc.getState_Component(); } catch (e) { r2 = null; }
-			if (!r2) continue;
-			var k2 = r2.libraryUuid + "|" + r2.uuid;
-			var des = "";
-			try { des = cc.getState_Designator() || ""; } catch (e) { des = ""; }
-			for (var jj = 0; jj < items.length; jj++) {
-				if (items[jj].libraryUuid + "|" + items[jj].deviceUuid === k2) {
-					if (des) items[jj].designators.push(String(des));
-					break;
+			if (!c) continue;
+			var raw = { _i: i };
+			for (var si = 0; si < sts.length; si++) {
+				var fn = "getState_" + sts[si];
+				if (typeof c[fn] === "function") {
+					try { raw[sts[si]] = c[fn](); } catch (e1) { raw[sts[si]] = "ERR:" + msg(e1); }
 				}
 			}
+			for (var oj = 0; oj < objKeys.length; oj++) {
+				var fk = "getState_" + objKeys[oj];
+				if (typeof c[fk] === "function") {
+					try { raw[objKeys[oj]] = c[fk](); } catch (e2) { raw[objKeys[oj]] = "ERR:" + msg(e2); }
+				}
+			}
+			var ref = (raw.Component && raw.Component.uuid) ? raw.Component : null;
+			var des = (raw.Designator !== undefined && raw.Designator !== null) ? String(raw.Designator) : "";
+			var nm = (raw.Name !== undefined && raw.Name !== null) ? String(raw.Name) : "";
+			items.push({
+				deviceUuid: ref ? ref.uuid : "",
+				libraryUuid: ref ? ref.libraryUuid : "",
+				deviceName: (ref && ref.name) || nm || "",
+				designators: des ? [des] : [],
+				raw: raw
+			});
 		}
 		return items;
 	}

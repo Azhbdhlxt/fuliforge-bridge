@@ -1,0 +1,55 @@
+{
+  "name": "fuliforge-bridge",
+  "uuid": "c4a1f0e7b3d24a8f9e6c5b2d1a0f3e7c",
+  "displayName": "FuliForge Bridge",
+  "description": "把嘉立创 EDA 的器件、符号、封装、3D 模型与设计规则导出到本地 FuliForge 自动化平台（供 KiCad / Altium / FreeCAD / Blender 使用）",
+  "version": "0.1.2",
+  "publisher": "FuliForge",
+  "engines": { "eda": "~3.2.0" },
+  "license": "MIT",
+  "repository": { "type": "git", "url": "https://github.com/Azhbdhlxt/fuliforge-bridge" },
+  "categories": "Other",
+  "keywords": ["FuliForge", "Library", "Export", "KiCad"],
+  "activationEvents": { "onStartupFinished": true },
+  "entry": "./dist/index",
+  "dependentExtensions": {},
+  "headerMenus": {
+    "home": [{ "id": "FuliForge", "title": "FuliForge", "menuItems": [
+      { "id": "Status", "title": "连接状态", "registerFn": "showStatus" },
+      { "id": "Reconnect", "title": "重新连接", "registerFn": "reconnect" },
+      { "id": "ExportCurrent", "title": "导出当前器件到 FuliForge", "registerFn": "exportCurrent" },
+      { "id": "ExportRules", "title": "导出设计规则", "registerFn": "exportRules" },
+      { "id": "About", "title": "关于…", "registerFn": "about" }
+    ]}],
+    "blank": [{ "id": "FuliForge", "title": "FuliForge", "menuItems": [
+      { "id": "Status", "title": "连接状态", "registerFn": "showStatus" },
+      { "id": "Reconnect", "title": "重新连接", "registerFn": "reconnect" },
+      { "id": "About", "title": "关于…", "registerFn": "about" }
+    ]}],
+    "sch": [{ "id": "FuliForge", "title": "FuliForge", "menuItems": [
+      { "id": "Status", "title": "连接状态", "registerFn": "showStatus" },
+      { "id": "Reconnect", "title": "重新连接", "registerFn": "reconnect" },
+      { "id": "ExportCurrent", "title": "导出当前器件到 FuliForge", "registerFn": "exportCurrent" },
+      { "id": "ExportRules", "title": "导出设计规则", "registerFn": "exportRules" },
+      { "id": "About", "title": "关于…", "registerFn": "about" }
+    ]}],
+    "symbol": [{ "id": "FuliForge", "title": "FuliForge", "menuItems": [
+      { "id": "Status", "title": "连接状态", "registerFn": "showStatus" },
+      { "id": "Reconnect", "title": "重新连接", "registerFn": "reconnect" },
+      { "id": "ExportCurrent", "title": "导出当前符号到 FuliForge", "registerFn": "exportCurrent" },
+      { "id": "About", "title": "关于…", "registerFn": "about" }
+    ]}],
+    "pcb": [{ "id": "FuliForge", "title": "FuliForge", "menuItems": [
+      { "id": "Status", "title": "连接状态", "registerFn": "showStatus" },
+      { "id": "Reconnect", "title": "重新连接", "registerFn": "reconnect" },
+      { "id": "ExportRules", "title": "导出设计规则", "registerFn": "exportRules" },
+      { "id": "About", "title": "关于…", "registerFn": "about" }
+    ]}],
+    "footprint": [{ "id": "FuliForge", "title": "FuliForge", "menuItems": [
+      { "id": "Status", "title": "连接状态", "registerFn": "showStatus" },
+      { "id": "Reconnect", "title": "重新连接", "registerFn": "reconnect" },
+      { "id": "ExportCurrent", "title": "导出当前封装到 FuliForge", "registerFn": "exportCurrent" },
+      { "id": "About", "title": "关于…", "registerFn": "about" }
+    ]}]
+  }
+}

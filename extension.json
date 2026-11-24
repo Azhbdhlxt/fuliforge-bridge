@@ -3,7 +3,7 @@
 	"uuid": "c4a1f0e7b3d24a8f9e6c5b2d1a0f3e7c",
 	"displayName": "FuliForge Bridge",
 	"description": "把嘉立创 EDA 的器件、符号、封装、3D 模型与设计规则导出到本地 FuliForge 自动化平台（供 KiCad / Altium / FreeCAD / Blender 使用）",
-	"version": "0.1.4",
+	"version": "0.1.5",
 	"publisher": "FuliForge",
 	"engines": {
 		"eda": "~3.2.0"
